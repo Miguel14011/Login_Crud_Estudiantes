@@ -2,29 +2,23 @@
 
 namespace App\Models;
 
-use Database\Factories\EstudianteFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Modelo (la "M" de MVC): representa la tabla `estudiantes`.
+ * Modelo (la "M" de MVC) usado por el CRUD.
+ *
+ * Usa la MISMA tabla `users`, pero solo ve las filas con role = 'estudiante':
+ * el administrador nunca aparece en el listado ni se puede editar desde el CRUD.
+ * Hereda de User los campos, el cifrado de la contraseña y la factory.
  */
-#[Fillable(['nombre', 'apellido', 'email', 'carrera', 'semestre'])]
-class Estudiante extends Model
+class Estudiante extends User
 {
-    /** @use HasFactory<EstudianteFactory> */
-    use HasFactory;
+    protected $table = 'users';
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected static function booted(): void
     {
-        return [
-            'semestre' => 'integer',
-        ];
+        static::addGlobalScope('estudiantes', fn (Builder $query) => $query->where('role', self::ROLE_ESTUDIANTE));
+
+        static::creating(fn (Estudiante $estudiante) => $estudiante->role = self::ROLE_ESTUDIANTE);
     }
 }

@@ -8,23 +8,24 @@ export default function AppLayout({ title, actions, children }) {
             <nav className="bg-indigo-700 text-white shadow">
                 <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
                     <div className="flex items-center gap-6">
-                        <Link href="/estudiantes" className="text-lg font-semibold">
+                        <Link href="/" className="text-lg font-semibold">
                             Gestión de Estudiantes
                         </Link>
-                        <Link href="/estudiantes" className="text-sm text-white/80 hover:text-white">
-                            Estudiantes
-                        </Link>
-                        {auth.isAdmin && (
-                            <Link href="/usuarios" className="text-sm text-white/80 hover:text-white">
-                                Usuarios
+                        {auth.isAdmin ? (
+                            <Link href="/estudiantes" className="text-sm text-white/80 hover:text-white">
+                                Estudiantes
+                            </Link>
+                        ) : (
+                            <Link href="/perfil" className="text-sm text-white/80 hover:text-white">
+                                Mi perfil
                             </Link>
                         )}
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                         <span>
-                            Hola, <strong>{auth.user?.name}</strong>
+                            Hola, <strong>{auth.user?.nombre}</strong>
                             <span className="ml-2 rounded bg-white/20 px-2 py-0.5 text-xs uppercase">
-                                {auth.isAdmin ? 'Admin' : 'Usuario'}
+                                {auth.isAdmin ? 'Admin' : 'Estudiante'}
                             </span>
                         </span>
                         <Link

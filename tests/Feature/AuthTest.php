@@ -16,6 +16,8 @@ class AuthTest extends TestCase
     {
         $estudiante = Estudiante::factory()->create();
 
+        $this->get('/')->assertRedirect('/login');
+        $this->get('/perfil')->assertRedirect('/login');
         $this->get('/estudiantes')->assertRedirect('/login');
         $this->get('/estudiantes/create')->assertRedirect('/login');
         $this->get("/estudiantes/{$estudiante->id}")->assertRedirect('/login');
@@ -24,7 +26,7 @@ class AuthTest extends TestCase
         $this->put("/estudiantes/{$estudiante->id}", [])->assertRedirect('/login');
         $this->delete("/estudiantes/{$estudiante->id}")->assertRedirect('/login');
 
-        $this->assertDatabaseHas('estudiantes', ['id' => $estudiante->id]);
+        $this->assertModelExists($estudiante);
     }
 
     public function test_la_contrasena_se_guarda_cifrada_con_bcrypt(): void
@@ -37,19 +39,25 @@ class AuthTest extends TestCase
         $this->assertTrue(Hash::check('admin123', $guardada));
     }
 
-    public function test_login_con_credenciales_validas(): void
+    public function test_el_admin_inicia_sesion_y_llega_al_crud(): void
     {
-        User::factory()->create(['username' => 'admin', 'password' => 'admin123']);
+        User::factory()->admin()->create(['username' => 'admin', 'password' => 'admin123']);
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])
-            ->assertRedirect('/estudiantes');
+        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertRedirect('/');
+        $this->get('/')->assertRedirect('/estudiantes');
+    }
 
-        $this->assertAuthenticated();
+    public function test_el_estudiante_inicia_sesion_y_llega_a_su_perfil(): void
+    {
+        Estudiante::factory()->create(['username' => 'juan', 'password' => 'clave1234']);
+
+        $this->post('/login', ['username' => 'juan', 'password' => 'clave1234'])->assertRedirect('/');
+        $this->get('/')->assertRedirect('/perfil');
     }
 
     public function test_login_con_credenciales_invalidas(): void
     {
-        User::factory()->create(['username' => 'admin', 'password' => 'admin123']);
+        User::factory()->admin()->create(['username' => 'admin', 'password' => 'admin123']);
 
         $this->post('/login', ['username' => 'admin', 'password' => 'incorrecta'])
             ->assertSessionHasErrors(['username' => 'Usuario o contraseña incorrectos.']);
@@ -61,7 +69,7 @@ class AuthTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $this->get('/login')->assertRedirect('/estudiantes');
+        $this->get('/login')->assertRedirect('/');
         $this->post('/logout')->assertRedirect('/login');
 
         $this->assertGuest();

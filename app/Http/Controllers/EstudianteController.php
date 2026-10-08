@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EstudianteRequest;
 use App\Models\Estudiante;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
  * Controlador (la "C" de MVC): recibe las peticiones, usa el Modelo
  * Estudiante y devuelve la Vista (componente React vía Inertia).
+ * Solo el administrador llega aquí (middleware can:admin en las rutas).
  */
 class EstudianteController extends Controller
 {
-    /** READ: listado */
+    /** READ: listado de todos los estudiantes registrados */
     public function index(Request $request): Response
     {
         $buscar = $request->string('buscar')->trim()->value();
@@ -24,6 +25,7 @@ class EstudianteController extends Controller
             ->when($buscar, fn ($q) => $q->where(fn ($q) => $q
                 ->where('nombre', 'like', "%{$buscar}%")
                 ->orWhere('apellido', 'like', "%{$buscar}%")
+                ->orWhere('username', 'like', "%{$buscar}%")
                 ->orWhere('email', 'like', "%{$buscar}%")
                 ->orWhere('carrera', 'like', "%{$buscar}%")))
             ->orderBy('apellido')
@@ -43,9 +45,9 @@ class EstudianteController extends Controller
     }
 
     /** CREATE: guardar */
-    public function store(Request $request): RedirectResponse
+    public function store(EstudianteRequest $request): RedirectResponse
     {
-        Estudiante::create($request->validate($this->rules()));
+        Estudiante::create($request->datos());
 
         return redirect()->route('estudiantes.index')
             ->with('success', 'Estudiante creado correctamente.');
@@ -68,9 +70,9 @@ class EstudianteController extends Controller
     }
 
     /** UPDATE: guardar cambios */
-    public function update(Request $request, Estudiante $estudiante): RedirectResponse
+    public function update(EstudianteRequest $request, Estudiante $estudiante): RedirectResponse
     {
-        $estudiante->update($request->validate($this->rules($estudiante)));
+        $estudiante->update($request->datos());
 
         return redirect()->route('estudiantes.index')
             ->with('success', 'Estudiante actualizado correctamente.');
@@ -83,19 +85,5 @@ class EstudianteController extends Controller
 
         return redirect()->route('estudiantes.index')
             ->with('success', 'Estudiante eliminado correctamente.');
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function rules(?Estudiante $estudiante = null): array
-    {
-        return [
-            'nombre' => ['required', 'string', 'max:100'],
-            'apellido' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150', Rule::unique('estudiantes')->ignore($estudiante)],
-            'carrera' => ['required', 'string', 'max:150'],
-            'semestre' => ['required', 'integer', 'between:1,12'],
-        ];
     }
 }

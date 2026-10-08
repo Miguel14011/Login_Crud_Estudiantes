@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'alpha_dash' => 'El campo :attribute solo puede tener letras, números, guiones y guiones bajos.',
     'between' => [
         'numeric' => 'El campo :attribute debe estar entre :min y :max.',
     ],
@@ -18,8 +17,13 @@ return [
     'string' => 'El campo :attribute debe ser texto.',
     'unique' => 'Este :attribute ya está registrado.',
 
+    'custom' => [
+        'username' => [
+            'regex' => 'El usuario solo puede tener letras, números, puntos, guiones y guiones bajos (sin espacios).',
+        ],
+    ],
+
     'attributes' => [
-        'name' => 'nombre',
         'username' => 'usuario',
         'password' => 'contraseña',
         'email' => 'correo electrónico',

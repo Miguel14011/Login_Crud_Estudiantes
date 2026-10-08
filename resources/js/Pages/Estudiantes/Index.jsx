@@ -1,9 +1,8 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
 
 export default function Index({ estudiantes, filtros }) {
-    const { isAdmin } = usePage().props.auth;
     const [buscar, setBuscar] = useState(filtros.buscar ?? '');
 
     const filtrar = (e) => {
@@ -19,31 +18,22 @@ export default function Index({ estudiantes, filtros }) {
 
     return (
         <AppLayout
-            title="Estudiantes"
+            title="Estudiantes registrados"
             actions={
-                isAdmin && (
-                    <Link
-                        href="/estudiantes/create"
-                        className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                    >
-                        + Nuevo estudiante
-                    </Link>
-                )
+                <Link
+                    href="/estudiantes/create"
+                    className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                >
+                    + Nuevo estudiante
+                </Link>
             }
         >
             <Head title="Estudiantes" />
 
-            {!isAdmin && (
-                <div className="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    Tienes acceso de <strong>solo lectura</strong>. Solo un administrador puede crear, editar o eliminar
-                    estudiantes.
-                </div>
-            )}
-
             <form onSubmit={filtrar} className="mb-4 flex gap-2">
                 <input
                     type="search"
-                    placeholder="Buscar por nombre, email o carrera…"
+                    placeholder="Buscar por nombre, usuario, email o carrera…"
                     value={buscar}
                     onChange={(e) => setBuscar(e.target.value)}
                     className="w-full max-w-sm rounded border border-slate-300 bg-white px-3 py-2"
@@ -56,6 +46,7 @@ export default function Index({ estudiantes, filtros }) {
                     <thead className="bg-slate-50 text-xs uppercase text-slate-500">
                         <tr>
                             <th className="px-4 py-3">Nombre</th>
+                            <th className="px-4 py-3">Usuario</th>
                             <th className="px-4 py-3">Email</th>
                             <th className="px-4 py-3">Carrera</th>
                             <th className="px-4 py-3 text-center">Semestre</th>
@@ -65,7 +56,7 @@ export default function Index({ estudiantes, filtros }) {
                     <tbody className="divide-y divide-slate-100">
                         {estudiantes.data.length === 0 && (
                             <tr>
-                                <td colSpan="5" className="px-4 py-8 text-center text-slate-500">
+                                <td colSpan="6" className="px-4 py-8 text-center text-slate-500">
                                     No hay estudiantes registrados.
                                 </td>
                             </tr>
@@ -75,6 +66,7 @@ export default function Index({ estudiantes, filtros }) {
                                 <td className="px-4 py-3 font-medium">
                                     {e.nombre} {e.apellido}
                                 </td>
+                                <td className="px-4 py-3">{e.username}</td>
                                 <td className="px-4 py-3">{e.email}</td>
                                 <td className="px-4 py-3">{e.carrera}</td>
                                 <td className="px-4 py-3 text-center">{e.semestre}</td>
@@ -82,16 +74,12 @@ export default function Index({ estudiantes, filtros }) {
                                     <Link href={`/estudiantes/${e.id}`} className="text-slate-600 hover:underline">
                                         Ver
                                     </Link>
-                                    {isAdmin && (
-                                        <>
-                                            <Link href={`/estudiantes/${e.id}/edit`} className="text-indigo-600 hover:underline">
-                                                Editar
-                                            </Link>
-                                            <button onClick={() => eliminar(e)} className="text-red-600 hover:underline">
-                                                Eliminar
-                                            </button>
-                                        </>
-                                    )}
+                                    <Link href={`/estudiantes/${e.id}/edit`} className="text-indigo-600 hover:underline">
+                                        Editar
+                                    </Link>
+                                    <button onClick={() => eliminar(e)} className="text-red-600 hover:underline">
+                                        Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         ))}

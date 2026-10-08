@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,7 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'username', 'email', 'password'])]
+/**
+ * Modelo de la tabla `users`: toda persona que inicia sesión
+ * (el administrador y los estudiantes).
+ *
+ * 'role' no está en Fillable: nadie puede asignarse admin desde un formulario.
+ */
+#[Fillable(['nombre', 'apellido', 'username', 'email', 'carrera', 'semestre', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -19,9 +24,12 @@ class User extends Authenticatable
 
     public const ROLE_ADMIN = 'admin';
 
-    public const ROLE_USUARIO = 'usuario';
+    public const ROLE_ESTUDIANTE = 'estudiante';
 
-    // 'role' no está en Fillable: nadie puede asignarse admin desde el formulario de registro
+    protected $attributes = [
+        'role' => self::ROLE_ESTUDIANTE,
+    ];
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
@@ -35,7 +43,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'semestre' => 'integer',
             'password' => 'hashed',
         ];
     }

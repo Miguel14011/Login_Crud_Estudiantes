@@ -11,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Una sola tabla para el administrador y los estudiantes
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('nombre');
+            $table->string('apellido');
             $table->string('username')->unique();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('carrera')->nullable();               // null para el admin
+            $table->unsignedTinyInteger('semestre')->nullable(); // null para el admin
+            $table->string('role', 20)->default('estudiante');   // 'admin' | 'estudiante'
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

@@ -16,14 +16,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Administrador para iniciar sesión: admin / admin123
+        // Administrador: admin / admin123
         User::factory()->admin()->create([
-            'name' => 'Administrador',
+            'nombre' => 'Administrador',
+            'apellido' => 'General',
             'username' => 'admin',
             'email' => 'admin@example.com',
             'password' => 'admin123',
         ]);
 
-        Estudiante::factory(8)->create();
+        // Estudiante de prueba: estudiante / estudiante123
+        Estudiante::factory()->create([
+            'nombre' => 'Juan',
+            'apellido' => 'Pérez',
+            'username' => 'estudiante',
+            'email' => 'juan.perez@example.com',
+            'carrera' => 'Ingeniería de Sistemas',
+            'semestre' => 5,
+            'password' => 'estudiante123',
+        ]);
+
+        // Más estudiantes de ejemplo (contraseña: password)
+        Estudiante::factory(7)->create();
     }
 }

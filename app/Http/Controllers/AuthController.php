@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\EstudianteRequest;
+use App\Models\Estudiante;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Controlador de autenticación: registro de usuarios, login con
+ * Controlador de autenticación: registro de estudiantes, login con
  * usuario/contraseña contra la tabla `users` y cierre de sesión.
  */
 class AuthController extends Controller
@@ -38,7 +38,7 @@ class AuthController extends Controller
         // Evita ataques de fijación de sesión
         $request->session()->regenerate();
 
-        return redirect()->intended(route('estudiantes.index'));
+        return redirect()->intended(route('inicio'));
     }
 
     public function showRegister(): Response
@@ -46,23 +46,19 @@ class AuthController extends Controller
         return Inertia::render('Auth/Register');
     }
 
-    public function register(Request $request): RedirectResponse
+    /**
+     * Solo se pueden registrar estudiantes: el rol 'estudiante' lo asigna el modelo.
+     */
+    public function register(EstudianteRequest $request): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'alpha_dash', 'min:3', 'max:30', 'unique:users'],
-            'email' => ['required', 'email', 'max:150', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
+        // El cast 'hashed' del modelo cifra la contraseña con bcrypt
+        $estudiante = Estudiante::create($request->datos());
 
-        // El cast 'hashed' del modelo User cifra la contraseña con bcrypt
-        $user = User::create($datos);
-
-        Auth::login($user);
+        Auth::login($estudiante);
         $request->session()->regenerate();
 
-        return redirect()->route('estudiantes.index')
-            ->with('success', "¡Bienvenido, {$user->name}! Tu cuenta fue creada.");
+        return redirect()->route('perfil')
+            ->with('success', "¡Bienvenido, {$estudiante->nombre}! Tu cuenta fue creada.");
     }
 
     public function logout(Request $request): RedirectResponse

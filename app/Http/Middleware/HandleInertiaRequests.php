@@ -24,7 +24,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user()?->only('id', 'name', 'username', 'role'),
+                'user' => $request->user()?->only('id', 'nombre', 'apellido', 'username', 'role'),
                 'isAdmin' => (bool) $request->user()?->isAdmin(),
             ],
             'flash' => [

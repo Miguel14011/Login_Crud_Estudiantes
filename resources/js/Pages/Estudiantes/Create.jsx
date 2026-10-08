@@ -1,13 +1,14 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Form from './Form';
+import { valoresIniciales } from '../../Components/CamposEstudiante';
 
 export default function Create() {
-    const form = useForm({ nombre: '', apellido: '', email: '', carrera: '', semestre: '' });
+    const form = useForm(valoresIniciales);
 
     const submit = (e) => {
         e.preventDefault();
-        form.post('/estudiantes');
+        form.post('/estudiantes', { onError: () => form.reset('password', 'password_confirmation') });
     };
 
     return (
