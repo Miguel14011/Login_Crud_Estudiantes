@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
   <img src="https://img.shields.io/badge/Inertia.js-3-9553E9" alt="Inertia.js 3">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4">
-  <img src="https://img.shields.io/badge/tests-11%20pasando-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/tests-16%20pasando-brightgreen" alt="Tests">
   <img src="https://img.shields.io/badge/licencia-MIT-blue" alt="Licencia MIT">
 </p>
 
@@ -58,6 +58,7 @@ El objetivo es aplicar en un mismo proyecto:
 
 | Funcionalidad | Descripción |
 |---|---|
+| 📝 **Registro** | Cualquier persona puede crear su cuenta (nombre, usuario, correo y contraseña con confirmación) |
 | 🔐 **Iniciar sesión** | Acceso con usuario y contraseña, opción "Recordarme" |
 | 🚫 **Rutas protegidas** | Sin sesión, cualquier URL del CRUD redirige a `/login` |
 | 📋 **Listar** | Tabla con búsqueda por nombre, correo o carrera, y paginación |
@@ -72,6 +73,10 @@ El objetivo es aplicar en un mismo proyecto:
 | Login | Credenciales incorrectas |
 |---|---|
 | ![Login](docs/screenshots/01-login.png) | ![Error de login](docs/screenshots/02-login-error.png) |
+
+| Registro con validaciones | Registro exitoso (inicia sesión automáticamente) |
+|---|---|
+| ![Registro](docs/screenshots/08-registro-validacion.png) | ![Registro exitoso](docs/screenshots/09-registro-exitoso.png) |
 
 | Listado (Leer) | Crear con validaciones |
 |---|---|
@@ -102,11 +107,18 @@ flowchart LR
 | Capa | Archivos |
 |---|---|
 | **Modelo** | [`app/Models/Estudiante.php`](app/Models/Estudiante.php), [`app/Models/User.php`](app/Models/User.php), migraciones en [`database/migrations/`](database/migrations/) |
-| **Vista** | [`resources/js/Pages/`](resources/js/Pages/): `Auth/Login.jsx`, `Estudiantes/Index.jsx`, `Create.jsx`, `Edit.jsx`, `Show.jsx`, `Form.jsx`; layout en [`resources/js/Layouts/AppLayout.jsx`](resources/js/Layouts/AppLayout.jsx) |
-| **Controlador** | [`EstudianteController.php`](app/Http/Controllers/EstudianteController.php) (CRUD) y [`AuthController.php`](app/Http/Controllers/AuthController.php) (login/logout) |
+| **Vista** | [`resources/js/Pages/`](resources/js/Pages/): `Auth/Login.jsx`, `Auth/Register.jsx`, `Estudiantes/Index.jsx`, `Create.jsx`, `Edit.jsx`, `Show.jsx`, `Form.jsx`; layout en [`resources/js/Layouts/AppLayout.jsx`](resources/js/Layouts/AppLayout.jsx) |
+| **Controlador** | [`EstudianteController.php`](app/Http/Controllers/EstudianteController.php) (CRUD) y [`AuthController.php`](app/Http/Controllers/AuthController.php) (registro, login y logout) |
 | **Rutas** | [`routes/web.php`](routes/web.php) |
 
-### Rutas del CRUD
+### Rutas públicas (solo sin sesión)
+
+| Método | URL | Acción |
+|---|---|---|
+| `GET` / `POST` | `/login` | `showLogin` / `login` |
+| `GET` / `POST` | `/register` | `showRegister` / `register` |
+
+### Rutas del CRUD (requieren sesión)
 
 | Operación | Método | URL | Acción |
 |---|---|---|---|
@@ -130,7 +142,7 @@ Route::middleware('auth')->group(function () {
 });
 ```
 
-El middleware `auth` se ejecuta **en el servidor**. Si no hay sesión, Laravel responde con una redirección a `/login` antes de llegar al controlador. Por eso escribir la URL a mano en el navegador tampoco funciona. Además, la ruta `/login` usa el middleware `guest`: un usuario ya autenticado es enviado directamente al CRUD.
+El middleware `auth` se ejecuta **en el servidor**. Si no hay sesión, Laravel responde con una redirección a `/login` antes de llegar al controlador. Por eso escribir la URL a mano en el navegador tampoco funciona. Además, las rutas `/login` y `/register` usan el middleware `guest`: un usuario ya autenticado es enviado directamente al CRUD.
 
 ### Cifrado de contraseñas
 
@@ -212,6 +224,8 @@ Abre **http://127.0.0.1:8000** e ingresa con:
 |---|---|
 | `admin` | `admin123` |
 
+O crea tu propia cuenta desde **Regístrate** en la pantalla de login (`/register`).
+
 > 💡 Mientras desarrollas, usa `npm run dev` en otra terminal para ver los cambios de React al instante.
 
 ### Comandos útiles
@@ -228,12 +242,13 @@ Abre **http://127.0.0.1:8000** e ingresa con:
 php artisan test
 ```
 
-11 pruebas en [`tests/Feature/`](tests/Feature/) verifican que:
+16 pruebas en [`tests/Feature/`](tests/Feature/) verifican que:
 
 - Cada URL protegida (`index`, `create`, `show`, `edit`, `store`, `update`, `destroy`) **redirige a `/login` sin sesión**.
 - La contraseña se guarda **cifrada con bcrypt**.
 - El login acepta credenciales válidas y rechaza las incorrectas.
 - Un usuario autenticado no ve el login y puede cerrar sesión.
+- El registro crea el usuario con la contraseña cifrada, inicia sesión y valida usuario y correo únicos y la confirmación de contraseña.
 - Funcionan las operaciones CRUD y sus validaciones.
 
 ## 🛠️ Tecnologías utilizadas
@@ -255,7 +270,7 @@ crud-estudiantes/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── AuthController.php         # Login / logout
+│   │   │   ├── AuthController.php         # Registro / login / logout
 │   │   │   └── EstudianteController.php   # CRUD
 │   │   └── Middleware/
 │   │       └── HandleInertiaRequests.php  # Datos compartidos con React (usuario, mensajes)
@@ -271,7 +286,7 @@ crud-estudiantes/
 │   │   ├── app.jsx                        # Punto de entrada de React
 │   │   ├── Layouts/AppLayout.jsx
 │   │   └── Pages/
-│   │       ├── Auth/Login.jsx
+│   │       ├── Auth/{Login,Register}.jsx
 │   │       └── Estudiantes/{Index,Create,Edit,Show,Form}.jsx
 │   └── views/app.blade.php                # Plantilla HTML raíz
 ├── routes/

@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Controlador de autenticación: muestra el formulario, valida
- * usuario/contraseña contra la tabla `users` y maneja la sesión.
+ * Controlador de autenticación: registro de usuarios, login con
+ * usuario/contraseña contra la tabla `users` y cierre de sesión.
  */
 class AuthController extends Controller
 {
@@ -37,6 +39,30 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return redirect()->intended(route('estudiantes.index'));
+    }
+
+    public function showRegister(): Response
+    {
+        return Inertia::render('Auth/Register');
+    }
+
+    public function register(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'username' => ['required', 'alpha_dash', 'min:3', 'max:30', 'unique:users'],
+            'email' => ['required', 'email', 'max:150', 'unique:users'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        // El cast 'hashed' del modelo User cifra la contraseña con bcrypt
+        $user = User::create($datos);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('estudiantes.index')
+            ->with('success', "¡Bienvenido, {$user->name}! Tu cuenta fue creada.");
     }
 
     public function logout(Request $request): RedirectResponse

@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -69,6 +69,13 @@ export default function Login() {
                 >
                     {processing ? 'Ingresando…' : 'Ingresar'}
                 </button>
+
+                <p className="text-center text-sm text-slate-500">
+                    ¿No tienes cuenta?{' '}
+                    <Link href="/register" className="font-medium text-indigo-600 hover:underline">
+                        Regístrate
+                    </Link>
+                </p>
             </form>
         </div>
     );
