@@ -54,7 +54,7 @@ El objetivo es aplicar en un mismo proyecto:
 
 ## ✨ Funcionalidades y demostración
 
-🎥 **Video demostrativo:** [Ver en YouTube / Loom](https://ENLACE-DEL-VIDEO)
+🎥 **Video demostrativo:** [Ver en YouTube](https://youtu.be/vkZF2S__drY)
 
 | Funcionalidad | Quién | Descripción |
 |---|---|---|
