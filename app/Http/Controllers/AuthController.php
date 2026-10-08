@@ -38,7 +38,10 @@ class AuthController extends Controller
         // Evita ataques de fijación de sesión
         $request->session()->regenerate();
 
-        return redirect()->intended(route('inicio'));
+        // Directo a la página de su rol (sin pasar por "/"): una petición menos
+        $destino = $request->user()->isAdmin() ? route('estudiantes.index') : route('perfil');
+
+        return redirect()->intended($destino);
     }
 
     public function showRegister(): Response

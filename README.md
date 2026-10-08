@@ -201,12 +201,12 @@ $ php artisan usuarios:listar
 +----+------------+------------+--------------------------------------------------------------+
 | ID | Usuario    | Rol        | Contraseña almacenada (hash)                                 |
 +----+------------+------------+--------------------------------------------------------------+
-| 1  | admin      | admin      | $2y$12$Cy3ILXlWbVNmUfPttTZnWenZwljdkvrFAIRUgZXnGiPxZvOaE9gRO |
-| 2  | estudiante | estudiante | $2y$12$lhZiVr5OZc02XlNnc5dqpukLNYA3uc6nsrvocLZ32Ggj1zr1U2GHC |
+| 1  | admin      | admin      | $2y$10$gOdlEbhTvQ62i3pReTXjGu8.1HpckIffzjxX82RJ/ra32fitZQiTC |
+| 2  | estudiante | estudiante | $2y$10$MbZpRrNOkju5KTDA2DAOg.y5/5VPuOtcM4COs.3SdvkYmER8dEPoq |
 +----+------------+------------+--------------------------------------------------------------+
 ```
 
-> **¿Por qué bcrypt y no md5?** md5 se diseñó para ser rápido, por lo que hoy se pueden probar miles de millones de contraseñas por segundo. Además, sin *salt*, la misma contraseña siempre produce el mismo hash y se puede buscar en tablas precalculadas. **bcrypt** es lento a propósito (factor de costo `12`, el `$12$` del hash) y añade un *salt* aleatorio a cada contraseña, así que dos usuarios con la misma clave tienen hashes distintos.
+> **¿Por qué bcrypt y no md5?** md5 se diseñó para ser rápido, por lo que hoy se pueden probar miles de millones de contraseñas por segundo. Además, sin *salt*, la misma contraseña siempre produce el mismo hash y se puede buscar en tablas precalculadas. **bcrypt** es lento a propósito (factor de costo `10`, el `$10$` del hash: 2¹⁰ = 1024 rondas, configurable con `BCRYPT_ROUNDS` en el `.env`) y añade un *salt* aleatorio a cada contraseña, así que dos usuarios con la misma clave tienen hashes distintos.
 
 Al iniciar sesión, `Auth::attempt()` cifra la contraseña escrita y la compara con el hash guardado:
 

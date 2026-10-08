@@ -69,7 +69,7 @@ class RegisterTest extends TestCase
         $this->post('/register', $this->datos());
         $this->post('/logout');
 
-        $this->post('/login', ['username' => 'juanp', 'password' => 'secreto123'])->assertRedirect('/');
+        $this->post('/login', ['username' => 'juanp', 'password' => 'secreto123'])->assertRedirect('/perfil');
         $this->assertAuthenticated();
     }
 

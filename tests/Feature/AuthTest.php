@@ -43,7 +43,7 @@ class AuthTest extends TestCase
     {
         User::factory()->admin()->create(['username' => 'admin', 'password' => 'admin123']);
 
-        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertRedirect('/');
+        $this->post('/login', ['username' => 'admin', 'password' => 'admin123'])->assertRedirect('/estudiantes');
         $this->get('/')->assertRedirect('/estudiantes');
     }
 
@@ -51,7 +51,7 @@ class AuthTest extends TestCase
     {
         Estudiante::factory()->create(['username' => 'juan', 'password' => 'clave1234']);
 
-        $this->post('/login', ['username' => 'juan', 'password' => 'clave1234'])->assertRedirect('/');
+        $this->post('/login', ['username' => 'juan', 'password' => 'clave1234'])->assertRedirect('/perfil');
         $this->get('/')->assertRedirect('/perfil');
     }
 
