@@ -198,8 +198,8 @@ $request->session()->regenerate();
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/TU_USUARIO/crud-estudiantes.git
-cd crud-estudiantes
+git clone https://github.com/Miguel14011/Login_Crud_Estudiantes.git
+cd Login_Crud_Estudiantes
 
 # 2. Instalar dependencias
 composer install
@@ -266,7 +266,7 @@ php artisan test
 ## 📂 Estructura de carpetas
 
 ```text
-crud-estudiantes/
+Login_Crud_Estudiantes/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -297,7 +297,7 @@ crud-estudiantes/
 
 ## 👤 Persona desarrolladora
 
-| [<img src="https://github.com/TU_USUARIO.png" width="100px;"><br><sub><b>TU_NOMBRE</b></sub>](https://github.com/TU_USUARIO) |
+| [<img src="https://github.com/Miguel14011.png" width="100px;"><br><sub><b>Miguel14011</b></sub>](https://github.com/Miguel14011) |
 | :---: |
 
 ## 📄 Licencia
