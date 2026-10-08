@@ -4,7 +4,6 @@
     "type": "project",
     "description": "CRUD de estudiantes con login usando MVC (Laravel + React + Inertia).",
     "keywords": ["laravel", "framework"],
-    "license": "MIT",
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.5",

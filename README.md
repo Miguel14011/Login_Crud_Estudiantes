@@ -11,7 +11,6 @@
   <img src="https://img.shields.io/badge/Inertia.js-3-9553E9" alt="Inertia.js 3">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4">
   <img src="https://img.shields.io/badge/tests-16%20pasando-brightgreen" alt="Tests">
-  <img src="https://img.shields.io/badge/licencia-MIT-blue" alt="Licencia MIT">
 </p>
 
 <p align="center">
@@ -31,8 +30,6 @@
 - [Pruebas automáticas](#-pruebas-automáticas)
 - [Tecnologías utilizadas](#-tecnologías-utilizadas)
 - [Estructura de carpetas](#-estructura-de-carpetas)
-- [Persona desarrolladora](#-persona-desarrolladora)
-- [Licencia](#-licencia)
 
 ---
 
@@ -294,12 +291,3 @@ Login_Crud_Estudiantes/
 │   └── console.php                        # Comandos usuarios:listar / usuarios:crear
 └── tests/Feature/                         # Pruebas de login, protección y CRUD
 ```
-
-## 👤 Persona desarrolladora
-
-| [<img src="https://github.com/Miguel14011.png" width="100px;"><br><sub><b>Miguel14011</b></sub>](https://github.com/Miguel14011) |
-| :---: |
-
-## 📄 Licencia
-
-Este proyecto se distribuye bajo la licencia [MIT](LICENSE).
