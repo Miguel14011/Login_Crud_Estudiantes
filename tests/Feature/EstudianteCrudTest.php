@@ -15,7 +15,7 @@ class EstudianteCrudTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->admin()->create());
     }
 
     private function datos(array $extra = []): array

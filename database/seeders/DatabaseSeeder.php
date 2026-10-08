@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Usuario para iniciar sesión: admin / admin123
-        User::factory()->create([
+        // Administrador para iniciar sesión: admin / admin123
+        User::factory()->admin()->create([
             'name' => 'Administrador',
             'username' => 'admin',
             'email' => 'admin@example.com',

@@ -1,8 +1,9 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '../../Layouts/AppLayout';
 
 export default function Index({ estudiantes, filtros }) {
+    const { isAdmin } = usePage().props.auth;
     const [buscar, setBuscar] = useState(filtros.buscar ?? '');
 
     const filtrar = (e) => {
@@ -20,15 +21,24 @@ export default function Index({ estudiantes, filtros }) {
         <AppLayout
             title="Estudiantes"
             actions={
-                <Link
-                    href="/estudiantes/create"
-                    className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                >
-                    + Nuevo estudiante
-                </Link>
+                isAdmin && (
+                    <Link
+                        href="/estudiantes/create"
+                        className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    >
+                        + Nuevo estudiante
+                    </Link>
+                )
             }
         >
             <Head title="Estudiantes" />
+
+            {!isAdmin && (
+                <div className="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    Tienes acceso de <strong>solo lectura</strong>. Solo un administrador puede crear, editar o eliminar
+                    estudiantes.
+                </div>
+            )}
 
             <form onSubmit={filtrar} className="mb-4 flex gap-2">
                 <input
@@ -72,12 +82,16 @@ export default function Index({ estudiantes, filtros }) {
                                     <Link href={`/estudiantes/${e.id}`} className="text-slate-600 hover:underline">
                                         Ver
                                     </Link>
-                                    <Link href={`/estudiantes/${e.id}/edit`} className="text-indigo-600 hover:underline">
-                                        Editar
-                                    </Link>
-                                    <button onClick={() => eliminar(e)} className="text-red-600 hover:underline">
-                                        Eliminar
-                                    </button>
+                                    {isAdmin && (
+                                        <>
+                                            <Link href={`/estudiantes/${e.id}/edit`} className="text-indigo-600 hover:underline">
+                                                Editar
+                                            </Link>
+                                            <button onClick={() => eliminar(e)} className="text-red-600 hover:underline">
+                                                Eliminar
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}

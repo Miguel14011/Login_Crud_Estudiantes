@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
   <img src="https://img.shields.io/badge/Inertia.js-3-9553E9" alt="Inertia.js 3">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4">
-  <img src="https://img.shields.io/badge/tests-16%20pasando-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/tests-21%20pasando-brightgreen" alt="Tests">
 </p>
 
 <p align="center">
@@ -55,7 +55,8 @@ El objetivo es aplicar en un mismo proyecto:
 
 | Funcionalidad | Descripción |
 |---|---|
-| 📝 **Registro** | Cualquier persona puede crear su cuenta (nombre, usuario, correo y contraseña con confirmación) |
+| 📝 **Registro** | Cualquier persona puede crear su cuenta (nombre, usuario, correo y contraseña con confirmación); entra con rol de solo lectura |
+| 👥 **Roles** | **Administrador**: CRUD completo y gestión de usuarios. **Usuario**: solo puede ver |
 | 🔐 **Iniciar sesión** | Acceso con usuario y contraseña, opción "Recordarme" |
 | 🚫 **Rutas protegidas** | Sin sesión, cualquier URL del CRUD redirige a `/login` |
 | 📋 **Listar** | Tabla con búsqueda por nombre, correo o carrera, y paginación |
@@ -63,7 +64,7 @@ El objetivo es aplicar en un mismo proyecto:
 | 👁️ **Ver detalle** | Ficha completa del estudiante |
 | ✏️ **Editar** | Actualización de datos con las mismas validaciones |
 | 🗑️ **Eliminar** | Borrado con confirmación previa |
-| 🚪 **Cerrar sesión** | Invalida la sesión y regresa al login |
+| 🚪 **Cerrar sesión** | Invalida la sesión, limpia el historial del navegador y regresa al login |
 
 ### Capturas
 
@@ -83,9 +84,13 @@ El objetivo es aplicar en un mismo proyecto:
 |---|---|
 | ![Creado](docs/screenshots/05-creado.png) | ![Editar](docs/screenshots/06-editar.png) |
 
-| Detalle |
-|---|
-| ![Detalle](docs/screenshots/07-detalle.png) |
+| Detalle | Usuario con rol de solo lectura |
+|---|---|
+| ![Detalle](docs/screenshots/07-detalle.png) | ![Solo lectura](docs/screenshots/10-usuario-solo-lectura.png) |
+
+| Usuario sin permiso intenta crear (403) | Admin: gestión de usuarios y roles |
+|---|---|
+| ![Acceso denegado](docs/screenshots/11-acceso-denegado.png) | ![Usuarios](docs/screenshots/12-usuarios-admin.png) |
 
 ## 🏛️ Arquitectura MVC
 
@@ -104,8 +109,8 @@ flowchart LR
 | Capa | Archivos |
 |---|---|
 | **Modelo** | [`app/Models/Estudiante.php`](app/Models/Estudiante.php), [`app/Models/User.php`](app/Models/User.php), migraciones en [`database/migrations/`](database/migrations/) |
-| **Vista** | [`resources/js/Pages/`](resources/js/Pages/): `Auth/Login.jsx`, `Auth/Register.jsx`, `Estudiantes/Index.jsx`, `Create.jsx`, `Edit.jsx`, `Show.jsx`, `Form.jsx`; layout en [`resources/js/Layouts/AppLayout.jsx`](resources/js/Layouts/AppLayout.jsx) |
-| **Controlador** | [`EstudianteController.php`](app/Http/Controllers/EstudianteController.php) (CRUD) y [`AuthController.php`](app/Http/Controllers/AuthController.php) (registro, login y logout) |
+| **Vista** | [`resources/js/Pages/`](resources/js/Pages/): `Auth/Login.jsx`, `Auth/Register.jsx`, `Estudiantes/Index.jsx`, `Create.jsx`, `Edit.jsx`, `Show.jsx`, `Form.jsx`, `Usuarios/Index.jsx`, `Error.jsx`; layout en [`resources/js/Layouts/AppLayout.jsx`](resources/js/Layouts/AppLayout.jsx) |
+| **Controlador** | [`EstudianteController.php`](app/Http/Controllers/EstudianteController.php) (CRUD), [`AuthController.php`](app/Http/Controllers/AuthController.php) (registro, login y logout) y [`UsuarioController.php`](app/Http/Controllers/UsuarioController.php) (gestión de roles) |
 | **Rutas** | [`routes/web.php`](routes/web.php) |
 
 ### Rutas públicas (solo sin sesión)
@@ -115,17 +120,19 @@ flowchart LR
 | `GET` / `POST` | `/login` | `showLogin` / `login` |
 | `GET` / `POST` | `/register` | `showRegister` / `register` |
 
-### Rutas del CRUD (requieren sesión)
+### Rutas protegidas (requieren sesión)
 
-| Operación | Método | URL | Acción |
-|---|---|---|---|
-| Leer (listado) | `GET` | `/estudiantes` | `index` |
-| Crear (formulario) | `GET` | `/estudiantes/create` | `create` |
-| Crear (guardar) | `POST` | `/estudiantes` | `store` |
-| Leer (detalle) | `GET` | `/estudiantes/{id}` | `show` |
-| Actualizar (formulario) | `GET` | `/estudiantes/{id}/edit` | `edit` |
-| Actualizar (guardar) | `PUT` | `/estudiantes/{id}` | `update` |
-| Eliminar | `DELETE` | `/estudiantes/{id}` | `destroy` |
+| Operación | Método | URL | Acción | Quién puede |
+|---|---|---|---|---|
+| Leer (listado) | `GET` | `/estudiantes` | `index` | Todos |
+| Leer (detalle) | `GET` | `/estudiantes/{id}` | `show` | Todos |
+| Crear (formulario) | `GET` | `/estudiantes/create` | `create` | Solo admin |
+| Crear (guardar) | `POST` | `/estudiantes` | `store` | Solo admin |
+| Actualizar (formulario) | `GET` | `/estudiantes/{id}/edit` | `edit` | Solo admin |
+| Actualizar (guardar) | `PUT` | `/estudiantes/{id}` | `update` | Solo admin |
+| Eliminar | `DELETE` | `/estudiantes/{id}` | `destroy` | Solo admin |
+| Ver usuarios | `GET` | `/usuarios` | `index` | Solo admin |
+| Cambiar rol | `PATCH` | `/usuarios/{id}/rol` | `updateRole` | Solo admin |
 
 ## 🔒 Seguridad: login, rutas protegidas y cifrado
 
@@ -133,13 +140,36 @@ flowchart LR
 
 ```php
 // routes/web.php
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'inertia.encrypt'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::resource('estudiantes', EstudianteController::class);
+
+    // Solo administradores: si otro usuario lo intenta, responde 403
+    Route::middleware('can:admin')->group(function () {
+        Route::resource('estudiantes', EstudianteController::class)->except(['index', 'show']);
+        Route::get('/usuarios', [UsuarioController::class, 'index']);
+        Route::patch('/usuarios/{user}/rol', [UsuarioController::class, 'updateRole']);
+    });
+
+    // Cualquier usuario autenticado: solo lectura
+    Route::resource('estudiantes', EstudianteController::class)->only(['index', 'show']);
 });
 ```
 
 El middleware `auth` se ejecuta **en el servidor**. Si no hay sesión, Laravel responde con una redirección a `/login` antes de llegar al controlador. Por eso escribir la URL a mano en el navegador tampoco funciona. Además, las rutas `/login` y `/register` usan el middleware `guest`: un usuario ya autenticado es enviado directamente al CRUD.
+
+Al **cerrar sesión** se limpia el historial del navegador (`inertia.encrypt` + `Inertia::clearHistory()`), así que el botón "Atrás" tampoco muestra datos protegidos.
+
+### Roles: administrador y usuario
+
+| Rol | Cómo se obtiene | Permisos |
+|---|---|---|
+| **Administrador** | Cuenta `admin` del seeder, o asignado por otro admin | CRUD completo + página **Usuarios** para cambiar roles |
+| **Usuario** | Cualquiera que se registre en `/register` | **Solo lectura**: ver el listado y el detalle de los estudiantes |
+
+- El permiso se define con un **Gate** en [`AppServiceProvider.php`](app/Providers/AppServiceProvider.php): `Gate::define('admin', fn (User $user) => $user->isAdmin())`.
+- Las rutas de escritura usan `->middleware('can:admin')`. Si un usuario sin permiso escribe la URL a mano (por ejemplo `/estudiantes/create`), el **servidor responde 403** con una página de "Acceso denegado". Ocultar los botones en React es solo comodidad: la protección real está en el backend.
+- El campo `role` **no se puede enviar desde el registro**: no está en `$fillable`, así que nadie puede auto-asignarse administrador.
+- Un administrador no puede quitarse su propio rol, para evitar quedarse sin acceso.
 
 ### Cifrado de contraseñas
 
@@ -157,11 +187,12 @@ Así se ve la contraseña `admin123` en la base de datos. El hash cambia en cada
 
 ```text
 $ php artisan usuarios:listar
-+----+---------+--------------------------------------------------------------+
-| ID | Usuario | Contraseña almacenada (hash)                                 |
-+----+---------+--------------------------------------------------------------+
-| 1  | admin   | $2y$12$th6s5ZH2GcZ58dz5U8/wzuMD4cTrn23X3AyDdy37omVP0/ugclqJ6 |
-+----+---------+--------------------------------------------------------------+
++----+------------+---------+--------------------------------------------------------------+
+| ID | Usuario    | Rol     | Contraseña almacenada (hash)                                 |
++----+------------+---------+--------------------------------------------------------------+
+| 1  | admin      | admin   | $2y$12$6gIHAYJ6TFcKlz4fuOZLzugN3OvDSjHzSeIhYEJpXjYII4yxinIEK |
+| 2  | Miguel1209 | usuario | $2y$12$Tx/Q72NkYBUKyrenpFB8rehzJCJNleVjXByITGoaT1v6hedFiTdQq |
++----+------------+---------+--------------------------------------------------------------+
 ```
 
 > **¿Por qué bcrypt y no md5?** md5 se diseñó para ser rápido, por lo que hoy se pueden probar miles de millones de contraseñas por segundo. Además, sin *salt*, la misma contraseña siempre produce el mismo hash y se puede buscar en tablas precalculadas. **bcrypt** es lento a propósito (factor de costo `12`, el `$12$` del hash) y añade un *salt* aleatorio a cada contraseña, así que dos usuarios con la misma clave tienen hashes distintos.
@@ -217,11 +248,11 @@ php artisan serve
 
 Abre **http://127.0.0.1:8000** e ingresa con:
 
-| Usuario | Contraseña |
-|---|---|
-| `admin` | `admin123` |
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `admin123` | Administrador |
 
-O crea tu propia cuenta desde **Regístrate** en la pantalla de login (`/register`).
+O crea tu propia cuenta desde **Regístrate** en la pantalla de login (`/register`). Las cuentas nuevas tienen rol **usuario** (solo lectura); el admin puede cambiarlo desde la página **Usuarios**.
 
 > 💡 Mientras desarrollas, usa `npm run dev` en otra terminal para ver los cambios de React al instante.
 
@@ -229,8 +260,8 @@ O crea tu propia cuenta desde **Regístrate** en la pantalla de login (`/registe
 
 | Comando | Descripción |
 |---|---|
-| `php artisan usuarios:listar` | Muestra los usuarios y su contraseña cifrada |
-| `php artisan usuarios:crear juan clave123` | Crea un nuevo usuario para iniciar sesión |
+| `php artisan usuarios:listar` | Muestra los usuarios con su rol y su contraseña cifrada |
+| `php artisan usuarios:crear juan clave123` | Crea un usuario de solo lectura (agrega `--admin` para que sea administrador) |
 | `php artisan migrate:fresh --seed` | Reinicia la base de datos con los datos de ejemplo |
 
 ## 🧪 Pruebas automáticas
@@ -239,12 +270,13 @@ O crea tu propia cuenta desde **Regístrate** en la pantalla de login (`/registe
 php artisan test
 ```
 
-16 pruebas en [`tests/Feature/`](tests/Feature/) verifican que:
+21 pruebas en [`tests/Feature/`](tests/Feature/) verifican que:
 
 - Cada URL protegida (`index`, `create`, `show`, `edit`, `store`, `update`, `destroy`) **redirige a `/login` sin sesión**.
 - La contraseña se guarda **cifrada con bcrypt**.
 - El login acepta credenciales válidas y rechaza las incorrectas.
 - Un usuario autenticado no ve el login y puede cerrar sesión.
+- Un usuario normal recibe **403** en crear, editar, eliminar y `/usuarios`; el registro no permite auto-asignarse admin; el admin puede cambiar roles pero no el suyo.
 - El registro crea el usuario con la contraseña cifrada, inicia sesión y valida usuario y correo únicos y la confirmación de contraseña.
 - Funcionan las operaciones CRUD y sus validaciones.
 
@@ -268,12 +300,14 @@ Login_Crud_Estudiantes/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── AuthController.php         # Registro / login / logout
-│   │   │   └── EstudianteController.php   # CRUD
+│   │   │   ├── EstudianteController.php   # CRUD
+│   │   │   └── UsuarioController.php      # Gestión de roles (solo admin)
 │   │   └── Middleware/
-│   │       └── HandleInertiaRequests.php  # Datos compartidos con React (usuario, mensajes)
-│   └── Models/
-│       ├── Estudiante.php
-│       └── User.php
+│   │       └── HandleInertiaRequests.php  # Datos compartidos con React (usuario, rol, mensajes)
+│   ├── Models/
+│   │   ├── Estudiante.php
+│   │   └── User.php                       # Rol (admin / usuario) e isAdmin()
+│   └── Providers/AppServiceProvider.php   # Permiso (Gate) 'admin'
 ├── database/
 │   ├── factories/                         # Datos de prueba
 │   ├── migrations/                        # Estructura de las tablas
@@ -284,7 +318,9 @@ Login_Crud_Estudiantes/
 │   │   ├── Layouts/AppLayout.jsx
 │   │   └── Pages/
 │   │       ├── Auth/{Login,Register}.jsx
-│   │       └── Estudiantes/{Index,Create,Edit,Show,Form}.jsx
+│   │       ├── Estudiantes/{Index,Create,Edit,Show,Form}.jsx
+│   │       ├── Usuarios/Index.jsx
+│   │       └── Error.jsx                  # Páginas 403 / 404
 │   └── views/app.blade.php                # Plantilla HTML raíz
 ├── routes/
 │   ├── web.php                            # Rutas públicas y protegidas
