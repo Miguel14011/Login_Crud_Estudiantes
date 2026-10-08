@@ -72,6 +72,9 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Borra del navegador las páginas protegidas ya visitadas
+        Inertia::clearHistory();
+
         return redirect()->route('login');
     }
 }

@@ -14,8 +14,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 });
 
-// Sección protegida: sin sesión iniciada, redirige a /login
-Route::middleware('auth')->group(function () {
+// Sección protegida: sin sesión iniciada, redirige a /login.
+// 'inertia.encrypt' cifra el historial del navegador para que, tras cerrar
+// sesión, el botón "Atrás" no muestre datos guardados.
+Route::middleware(['auth', 'inertia.encrypt'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::resource('estudiantes', EstudianteController::class);
 });
