@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Carrera;
 use App\Models\Estudiante;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -16,6 +17,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Catálogo de facultades y carreras
+        $this->call(FacultadCarreraSeeder::class);
+
         // Administrador: admin / admin123
         User::factory()->admin()->create([
             'nombre' => 'Administrador',
@@ -29,9 +33,10 @@ class DatabaseSeeder extends Seeder
         Estudiante::factory()->create([
             'nombre' => 'Juan',
             'apellido' => 'Pérez',
+            'cedula' => '1710034065',
             'username' => 'estudiante',
             'email' => 'juan.perez@example.com',
-            'carrera' => 'Ingeniería de Sistemas',
+            'carrera_id' => Carrera::where('nombre', 'Ingeniería de Software')->value('id'),
             'semestre' => 5,
             'password' => 'estudiante123',
         ]);

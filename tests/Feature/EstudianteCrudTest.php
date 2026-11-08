@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Carrera;
 use App\Models\Estudiante;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,12 +25,16 @@ class EstudianteCrudTest extends TestCase
 
     private function datos(array $extra = []): array
     {
+        $carrera = Carrera::factory()->create();
+
         return [
             'nombre' => 'Ana',
             'apellido' => 'Pérez',
+            'cedula' => '1710034065',
             'username' => 'anap',
             'email' => 'ana@example.com',
-            'carrera' => 'Ingeniería de Sistemas',
+            'facultad_id' => $carrera->facultad_id,
+            'carrera_id' => $carrera->id,
             'semestre' => 3,
             'password' => 'secreto123',
             'password_confirmation' => 'secreto123',

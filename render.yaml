@@ -1,0 +1,42 @@
+# Blueprint de Render: crea la app web (Docker) y una base PostgreSQL gratuita.
+# En Render: New > Blueprint > seleccionar este repositorio.
+services:
+  - type: web
+    name: gestion-estudiantes
+    runtime: docker
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Gestión de Estudiantes
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        sync: false # se llena con la URL que asigne Render, ej. https://gestion-estudiantes.onrender.com
+      - key: APP_LOCALE
+        value: es
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: estudiantes-db
+          property: connectionString
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+
+databases:
+  - name: estudiantes-db
+    plan: free
+    databaseName: estudiantes

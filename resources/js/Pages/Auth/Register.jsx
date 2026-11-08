@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import CamposEstudiante, { valoresIniciales } from '../../Components/CamposEstudiante';
 
-export default function Register() {
+export default function Register({ facultades }) {
     const form = useForm(valoresIniciales);
 
     const submit = (e) => {
@@ -19,7 +19,7 @@ export default function Register() {
                     <p className="mt-1 text-sm text-slate-500">Crea tu cuenta con tus datos académicos</p>
                 </div>
 
-                <CamposEstudiante form={form} />
+                <CamposEstudiante form={form} facultades={facultades} />
 
                 <button
                     type="submit"

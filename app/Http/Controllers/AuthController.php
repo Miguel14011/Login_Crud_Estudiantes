@@ -46,7 +46,9 @@ class AuthController extends Controller
 
     public function showRegister(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'facultades' => EstudianteController::facultades(),
+        ]);
     }
 
     /**

@@ -33,7 +33,7 @@ export default function Index({ estudiantes, filtros }) {
             <form onSubmit={filtrar} className="mb-4 flex gap-2">
                 <input
                     type="search"
-                    placeholder="Buscar por nombre, usuario, email o carrera…"
+                    placeholder="Buscar por nombre, cédula, usuario, email o carrera…"
                     value={buscar}
                     onChange={(e) => setBuscar(e.target.value)}
                     className="w-full max-w-sm rounded border border-slate-300 bg-white px-3 py-2"
@@ -46,6 +46,7 @@ export default function Index({ estudiantes, filtros }) {
                     <thead className="bg-slate-50 text-xs uppercase text-slate-500">
                         <tr>
                             <th className="px-4 py-3">Nombre</th>
+                            <th className="px-4 py-3">Cédula</th>
                             <th className="px-4 py-3">Usuario</th>
                             <th className="px-4 py-3">Email</th>
                             <th className="px-4 py-3">Carrera</th>
@@ -56,7 +57,7 @@ export default function Index({ estudiantes, filtros }) {
                     <tbody className="divide-y divide-slate-100">
                         {estudiantes.data.length === 0 && (
                             <tr>
-                                <td colSpan="6" className="px-4 py-8 text-center text-slate-500">
+                                <td colSpan="7"className="px-4 py-8 text-center text-slate-500">
                                     No hay estudiantes registrados.
                                 </td>
                             </tr>
@@ -66,9 +67,13 @@ export default function Index({ estudiantes, filtros }) {
                                 <td className="px-4 py-3 font-medium">
                                     {e.nombre} {e.apellido}
                                 </td>
+                                <td className="px-4 py-3 font-mono">{e.cedula}</td>
                                 <td className="px-4 py-3">{e.username}</td>
                                 <td className="px-4 py-3">{e.email}</td>
-                                <td className="px-4 py-3">{e.carrera}</td>
+                                <td className="px-4 py-3">
+                                    {e.carrera?.nombre}
+                                    <span className="block text-xs text-slate-400">{e.carrera?.facultad?.nombre}</span>
+                                </td>
                                 <td className="px-4 py-3 text-center">{e.semestre}</td>
                                 <td className="space-x-3 whitespace-nowrap px-4 py-3 text-right">
                                     <Link href={`/estudiantes/${e.id}`} className="text-slate-600 hover:underline">

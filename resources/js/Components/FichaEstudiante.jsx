@@ -3,11 +3,13 @@ export default function FichaEstudiante({ estudiante }) {
     const filas = [
         ['Nombre', estudiante.nombre],
         ['Apellido', estudiante.apellido],
+        ['Cédula', estudiante.cedula],
         ['Usuario', estudiante.username],
         ['Email', estudiante.email],
-        ['Carrera', estudiante.carrera],
+        ['Facultad', estudiante.carrera?.facultad?.nombre],
+        ['Carrera', estudiante.carrera?.nombre],
         ['Semestre', estudiante.semestre],
-        ['Registrado', new Date(estudiante.created_at).toLocaleString('es-CO')],
+        ['Registrado', new Date(estudiante.created_at).toLocaleString('es-EC')],
     ];
 
     return (
@@ -15,7 +17,7 @@ export default function FichaEstudiante({ estudiante }) {
             {filas.map(([k, v]) => (
                 <div key={k} className="grid grid-cols-3 px-6 py-3">
                     <dt className="text-sm font-medium text-slate-500">{k}</dt>
-                    <dd className="col-span-2">{v}</dd>
+                    <dd className="col-span-2">{v ?? '—'}</dd>
                 </div>
             ))}
         </dl>

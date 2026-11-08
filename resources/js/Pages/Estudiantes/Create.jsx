@@ -3,7 +3,7 @@ import AppLayout from '../../Layouts/AppLayout';
 import Form from './Form';
 import { valoresIniciales } from '../../Components/CamposEstudiante';
 
-export default function Create() {
+export default function Create({ facultades }) {
     const form = useForm(valoresIniciales);
 
     const submit = (e) => {
@@ -14,7 +14,7 @@ export default function Create() {
     return (
         <AppLayout title="Nuevo estudiante">
             <Head title="Nuevo estudiante" />
-            <Form form={form} onSubmit={submit} submitLabel="Guardar" />
+            <Form form={form} facultades={facultades} onSubmit={submit} submitLabel="Guardar" />
         </AppLayout>
     );
 }

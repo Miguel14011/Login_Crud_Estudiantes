@@ -24,7 +24,7 @@ class PerfilController extends Controller
     public function show(Request $request): Response
     {
         return Inertia::render('Perfil', [
-            'estudiante' => $request->user(),
+            'estudiante' => $request->user()->load('carrera.facultad'),
         ]);
     }
 }

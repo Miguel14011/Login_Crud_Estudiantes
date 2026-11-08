@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
         ]);
 
+        // En producción (Render) la app corre detrás de un proxy HTTPS:
+        // confiar en él para que las URLs y cookies se generen con https
+        $middleware->trustProxies(at: '*');
+
         // Sin sesión -> /login ; con sesión intentando ver /login -> inicio según su rol
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/');

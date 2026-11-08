@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Carrera;
 use App\Models\User;
+use App\Support\Cedula;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -23,15 +25,11 @@ class UserFactory extends Factory
         return [
             'nombre' => fake()->firstName(),
             'apellido' => fake()->lastName(),
+            'cedula' => fn () => Cedula::generar(),
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'carrera' => fake()->randomElement([
-                'Ingeniería de Sistemas',
-                'Ingeniería Industrial',
-                'Administración de Empresas',
-                'Contaduría Pública',
-                'Psicología',
-            ]),
+            // Usa una carrera existente del catálogo; si no hay ninguna, crea una
+            'carrera_id' => fn () => Carrera::inRandomOrder()->first() ?? Carrera::factory(),
             'semestre' => fake()->numberBetween(1, 10),
             'role' => User::ROLE_ESTUDIANTE,
             // El cast 'hashed' cifra cada contraseña con su propio salt
@@ -47,7 +45,8 @@ class UserFactory extends Factory
     {
         return $this->state(fn () => [
             'role' => User::ROLE_ADMIN,
-            'carrera' => null,
+            'cedula' => null,
+            'carrera_id' => null,
             'semestre' => null,
         ]);
     }

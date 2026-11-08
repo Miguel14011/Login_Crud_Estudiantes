@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EstudianteRequest;
 use App\Models\Estudiante;
+use App\Models\Facultad;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,12 +24,14 @@ class EstudianteController extends Controller
         $buscar = $request->string('buscar')->trim()->value();
 
         $estudiantes = Estudiante::query()
+            ->with('carrera.facultad')
             ->when($buscar, fn ($q) => $q->where(fn ($q) => $q
                 ->where('nombre', 'like', "%{$buscar}%")
                 ->orWhere('apellido', 'like', "%{$buscar}%")
+                ->orWhere('cedula', 'like', "%{$buscar}%")
                 ->orWhere('username', 'like', "%{$buscar}%")
                 ->orWhere('email', 'like', "%{$buscar}%")
-                ->orWhere('carrera', 'like', "%{$buscar}%")))
+                ->orWhereHas('carrera', fn ($q) => $q->where('nombre', 'like', "%{$buscar}%"))))
             ->orderBy('apellido')
             ->paginate(10)
             ->withQueryString();
@@ -41,7 +45,9 @@ class EstudianteController extends Controller
     /** CREATE: formulario */
     public function create(): Response
     {
-        return Inertia::render('Estudiantes/Create');
+        return Inertia::render('Estudiantes/Create', [
+            'facultades' => self::facultades(),
+        ]);
     }
 
     /** CREATE: guardar */
@@ -57,7 +63,7 @@ class EstudianteController extends Controller
     public function show(Estudiante $estudiante): Response
     {
         return Inertia::render('Estudiantes/Show', [
-            'estudiante' => $estudiante,
+            'estudiante' => $estudiante->load('carrera.facultad'),
         ]);
     }
 
@@ -65,7 +71,8 @@ class EstudianteController extends Controller
     public function edit(Estudiante $estudiante): Response
     {
         return Inertia::render('Estudiantes/Edit', [
-            'estudiante' => $estudiante,
+            'estudiante' => $estudiante->load('carrera.facultad'),
+            'facultades' => self::facultades(),
         ]);
     }
 
@@ -85,5 +92,11 @@ class EstudianteController extends Controller
 
         return redirect()->route('estudiantes.index')
             ->with('success', 'Estudiante eliminado correctamente.');
+    }
+
+    /** Opciones del primer dropdown (las carreras se cargan al escoger una facultad) */
+    public static function facultades(): Collection
+    {
+        return Facultad::orderBy('nombre')->get(['id', 'nombre']);
     }
 }

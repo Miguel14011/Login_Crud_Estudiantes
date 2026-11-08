@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Carrera;
 use App\Models\Estudiante;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,14 +14,24 @@ class RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Carrera $psicologia;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->psicologia = Carrera::factory()->create(['nombre' => 'Psicología']);
+    }
+
     private function datos(array $extra = []): array
     {
         return [
             'nombre' => 'Juan',
             'apellido' => 'Pérez',
+            'cedula' => '1710034065',
             'username' => 'juanp',
             'email' => 'juan@example.com',
-            'carrera' => 'Psicología',
+            'facultad_id' => $this->psicologia->facultad_id,
+            'carrera_id' => $this->psicologia->id,
             'semestre' => 2,
             'password' => 'secreto123',
             'password_confirmation' => 'secreto123',
@@ -39,7 +50,7 @@ class RegisterTest extends TestCase
 
         $estudiante = Estudiante::where('username', 'juanp')->firstOrFail();
         $this->assertSame(User::ROLE_ESTUDIANTE, $estudiante->role);
-        $this->assertSame('Psicología', $estudiante->carrera);
+        $this->assertSame('Psicología', $estudiante->carrera->nombre);
         $this->assertNotSame('secreto123', $estudiante->getRawOriginal('password'));
         $this->assertTrue(Hash::check('secreto123', $estudiante->password));
         $this->assertAuthenticatedAs($estudiante);
@@ -77,8 +88,8 @@ class RegisterTest extends TestCase
     {
         Estudiante::factory()->create(['username' => 'juanp']);
 
-        $this->post('/register', $this->datos(['password_confirmation' => 'otra', 'email' => 'no-es-correo', 'carrera' => '']))
-            ->assertSessionHasErrors(['username', 'email', 'carrera', 'password']);
+        $this->post('/register', $this->datos(['password_confirmation' => 'otra', 'email' => 'no-es-correo', 'carrera_id' => '']))
+            ->assertSessionHasErrors(['username', 'email', 'carrera_id', 'password']);
 
         $this->assertGuest();
         $this->assertDatabaseCount('users', 1);

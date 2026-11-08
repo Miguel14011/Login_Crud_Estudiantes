@@ -1,9 +1,17 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
+
+// Catálogo para los dropdowns dependientes (Facultad -> Carreras).
+// Público porque lo usa también el formulario de registro.
+Route::get('/facultades/{facultad}/carreras', [CatalogoController::class, 'carreras'])
+    ->whereNumber('facultad')
+    ->middleware('throttle:60,1')
+    ->name('facultades.carreras');
 
 // Solo para visitantes NO autenticados
 Route::middleware('guest')->group(function () {

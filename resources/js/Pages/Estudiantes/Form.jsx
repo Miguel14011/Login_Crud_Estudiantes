@@ -2,10 +2,10 @@ import { Link } from '@inertiajs/react';
 import CamposEstudiante from '../../Components/CamposEstudiante';
 
 // Formulario del CRUD (crear y editar)
-export default function Form({ form, onSubmit, submitLabel, editando = false }) {
+export default function Form({ form, facultades, onSubmit, submitLabel, editando = false }) {
     return (
         <form onSubmit={onSubmit} className="space-y-5 rounded-lg bg-white p-6 shadow">
-            <CamposEstudiante form={form} editando={editando} />
+            <CamposEstudiante form={form} facultades={facultades} editando={editando} />
 
             <div className="flex justify-end gap-3">
                 <Link href="/estudiantes" className="rounded border border-slate-300 px-4 py-2 hover:bg-slate-50">
