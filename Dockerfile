@@ -8,10 +8,12 @@ COPY resources ./resources
 RUN npm run build
 
 # ---------- 2) Dependencias de PHP ----------
+# Sin --no-dev: los seeders usan Faker (dependencia de desarrollo) para
+# cargar los estudiantes de ejemplo la primera vez que arranca la app
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --optimize-autoloader --ignore-platform-reqs
+RUN composer install --no-interaction --no-scripts --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # ---------- 3) Imagen final: PHP 8.4 + Apache ----------
 FROM php:8.4-apache
